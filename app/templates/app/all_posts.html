@@ -1,0 +1,132 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}All Posts - BlogHub{% endblock %}
+
+{% block content %}
+<!-- Header Section -->
+<section>
+    <div class="container">
+        <div class="grid">
+            <div>
+                <div>
+                    <small>
+                        <i data-feather="list"></i>Discover All Content
+                    </small>
+                </div>
+                <h1>All Posts</h1>
+                <p>Explore all published posts from our amazing community of writers. Find stories, insights, and
+                    knowledge that inspire you.</p>
+                <div>
+                    <small>
+                        <i data-feather="book"></i>{{ total_posts }} posts available
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- All Posts Section -->
+{% if posts %}
+<section id="all-posts">
+    <div class="container">
+        <div class="posts-list">
+            {% for post in posts %}
+            <div class="post-item">
+                <div class="post-meta">
+                    <span class="post-date">
+                        <i data-feather="calendar"></i>{{ post.published_at|date:"M d, Y" }}
+                    </span>
+                    <span class="post-author">
+                        <i data-feather="user"></i>{{ post.author.username }}
+                    </span>
+                </div>
+                <h3 class="post-title">
+                    <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+                </h3>
+                <p class="post-excerpt">
+                    {% if post.excerpt %}
+                    {{ post.excerpt|truncatewords:25 }}
+                    {% else %}
+                    {{ post.content|truncatewords:25 }}
+                    {% endif %}
+                </p>
+                <div class="post-actions">
+                    <a href="{{ post.get_absolute_url }}" class="read-more">
+                        Read More <i data-feather="arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if posts.has_other_pages %}
+        <nav class="pagination-nav" aria-label="Posts pagination">
+            <div class="pagination-info">
+                <small>
+                    Showing {{ posts.start_index }}-{{ posts.end_index }} of {{ posts.paginator.count }} posts
+                </small>
+            </div>
+            <ul class="pagination">
+                {% if posts.has_previous %}
+                <li>
+                    <a href="?page=1" aria-label="First page">
+                        <i data-feather="chevrons-left"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="?page={{ posts.previous_page_number }}" aria-label="Previous page">
+                        <i data-feather="chevron-left"></i>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% for num in posts.paginator.page_range %}
+                {% if posts.number == num %}
+                <li>
+                    <a href="#" aria-current="page" class="current">{{ num }}</a>
+                </li>
+                {% elif num > posts.number|add:'-3' and num < posts.number|add:'3' %} <li>
+                    <a href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+
+                    {% if posts.has_next %}
+                    <li>
+                        <a href="?page={{ posts.next_page_number }}" aria-label="Next page">
+                            <i data-feather="chevron-right"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="?page={{ posts.paginator.num_pages }}" aria-label="Last page">
+                            <i data-feather="chevrons-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</section>
+{% else %}
+<!-- No Posts Section -->
+<section>
+    <div class="container">
+        <div class="grid">
+            <div>
+                <h2>No Posts Available</h2>
+                <p>There are no published posts at the moment. Check back later for amazing content!</p>
+                <div>
+                    <a href="{% url 'app:landing' %}" role="button" class="outline">
+                        <i data-feather="arrow-left"></i>Back to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}
